@@ -1,1 +1,783 @@
-<h1> Welcome to my page! </h1>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ying</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#06b6d4',
+                        dark: '#0f172a',
+                        darker: '#020617'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-gradient {
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .perspective-1000 {
+                perspective: 1000px;
+            }
+            .preserve-3d {
+                transform-style: preserve-3d;
+            }
+            .backface-hidden {
+                backface-visibility: hidden;
+            }
+        }
+
+        /* 自定义动画 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 30px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        #aurora-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #020617, #0f172a);
+        }
+
+        .tilt-card {
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 9999;
+            animation: particle-fade 1s ease-out forwards;
+        }
+
+        @keyframes particle-fade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        .skill-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 1.5s ease-out;
+            width: 0;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-darker text-white font-sans">
+    <!-- 极光背景Canvas -->
+    <canvas id="aurora-canvas"></canvas>
+
+    <!-- 导航栏 -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-500 py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="#hero" class="text-2xl font-bold text-gradient bg-gradient-to-r from-primary to-secondary">
+                Jinpeng
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="nav-link text-gray-300 hover:text-white transition-colors">首页</a>
+                <a href="#about" class="nav-link text-gray-300 hover:text-white transition-colors">关于我</a>
+                <a href="#academic" class="nav-link text-gray-300 hover:text-white transition-colors">学业</a>
+                <a href="#awards" class="nav-link text-gray-300 hover:text-white transition-colors">竞赛</a>
+                <a href="#skills" class="nav-link text-gray-300 hover:text-white transition-colors">技能</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-white">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark/95 backdrop-blur-lg absolute w-full">
+            <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
+                <a href="#hero" class="text-gray-300 hover:text-white transition-colors">首页</a>
+                <a href="#about" class="text-gray-300 hover:text-white transition-colors">关于我</a>
+                <a href="#academic" class="text-gray-300 hover:text-white transition-colors">学业</a>
+                <a href="#awards" class="text-gray-300 hover:text-white transition-colors">竞赛</a>
+                <a href="#skills" class="text-gray-300 hover:text-white transition-colors">技能</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区 -->
+    <section id="hero" class="min-h-screen flex items-center justify-center relative">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
+                你好，我是
+                <span class="text-gradient bg-gradient-to-r from-primary via-secondary to-accent">ying</span>
+            </h1>
+            <div class="text-xl md:text-2xl text-gray-300 h-8 mb-8">
+                <span id="typewriter"></span>
+                <span class="animate-pulse">|</span>
+            </div>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+                物理×编程 交叉学科开发者 | 用数理思维解决工程问题
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#about" class="px-8 py-3 bg-gradient-to-r from-primary to-secondary rounded-full font-medium hover:shadow-lg hover:shadow-primary/25 transition-all transform hover:scale-105">
+                    了解更多
+                </a>
+                <a href="#awards" class="px-8 py-3 border border-gray-600 rounded-full font-medium hover:border-primary hover:text-primary transition-all">
+                    查看荣誉
+                </a>
+            </div>
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-float">
+                <a href="#about" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa fa-chevron-down text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我 -->
+    <section id="about" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="section-title fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">关于我</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-12"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="perspective-1000">
+                    <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800 shadow-xl">
+                        <div class="text-6xl text-primary mb-6">
+                            <i class="fa fa-code-fork"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">交叉学科优势</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            相较于纯物理专业的学生，我掌握了更多的编程与计算机知识；
+                            而相较于计算机相关专业的学生，我拥有更扎实的数理基础。
+                        </p>
+                        <p class="text-gray-400 leading-relaxed mt-4">
+                            我擅长从数理底层出发，结合编程工具解决复杂问题，同时拥有极强的自学能力，
+                            能够快速掌握新领域的知识，面对问题时总能从多渠道尝试解决。
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="fade-in-up" style="animation-delay: 0.2s">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                                <i class="fa fa-graduation-cap text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">持续学习</h4>
+                                <p class="text-gray-400 text-sm">擅长AI辅助自学，快速掌握新领域</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fade-in-up" style="animation-delay: 0.4s">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
+                                <i class="fa fa-book text-secondary"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">文献阅读</h4>
+                                <p class="text-gray-400 text-sm">优秀的文献阅读与引用能力</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fade-in-up" style="animation-delay: 0.6s">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
+                                <i class="fa fa-wrench text-accent"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">问题解决</h4>
+                                <p class="text-gray-400 text-sm">耐心踏实，多渠道解决复杂问题</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 学业成绩 -->
+    <section id="academic" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="section-title fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">学业成绩</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-12"></div>
+            </div>
+            
+            <!-- 排名与奖学金 -->
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="perspective-1000 fade-in-up">
+                    <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 shadow-xl text-center">
+                        <div class="text-4xl font-bold text-gradient bg-gradient-to-r from-primary to-secondary mb-2">11/153</div>
+                        <p class="text-gray-400">专业绩点排名</p>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.2s">
+                    <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 shadow-xl text-center">
+                        <div class="text-4xl font-bold text-gradient bg-gradient-to-r from-secondary to-accent mb-2">3/39</div>
+                        <p class="text-gray-400">综合测评排名</p>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.4s">
+                    <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 shadow-xl text-center">
+                        <div class="text-4xl font-bold text-gradient bg-gradient-to-r from-accent to-primary mb-2">2+1</div>
+                        <p class="text-gray-400">年度奖学金</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 奖学金说明 -->
+            <div class="text-center mb-12 fade-in-up">
+                <p class="text-gray-400">
+                    2024、2025年连续获得校二等奖学金，同时获评研究与创新奖学金
+                </p>
+            </div>
+
+            <!-- 高分课程 -->
+            <h3 class="text-2xl font-bold text-center mb-8 fade-in-up">主修高分课程</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="perspective-1000 fade-in-up">
+                    <div class="tilt-card bg-gradient-to-br from-primary/20 to-transparent rounded-xl p-4 border border-primary/30 text-center">
+                        <div class="text-2xl font-bold text-primary">100</div>
+                        <div class="text-sm text-gray-300">C语言程序设计</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.1s">
+                    <div class="tilt-card bg-gradient-to-br from-secondary/20 to-transparent rounded-xl p-4 border border-secondary/30 text-center">
+                        <div class="text-2xl font-bold text-secondary">98</div>
+                        <div class="text-sm text-gray-300">计算物理</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.2s">
+                    <div class="tilt-card bg-gradient-to-br from-accent/20 to-transparent rounded-xl p-4 border border-accent/30 text-center">
+                        <div class="text-2xl font-bold text-accent">98</div>
+                        <div class="text-sm text-gray-300">大学外语</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.3s">
+                    <div class="tilt-card bg-gradient-to-br from-primary/20 to-transparent rounded-xl p-4 border border-primary/30 text-center">
+                        <div class="text-2xl font-bold text-primary">97</div>
+                        <div class="text-sm text-gray-300">数学物理方法</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.4s">
+                    <div class="tilt-card bg-gradient-to-br from-secondary/20 to-transparent rounded-xl p-4 border border-secondary/30 text-center">
+                        <div class="text-2xl font-bold text-secondary">92</div>
+                        <div class="text-sm text-gray-300">理论力学</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.5s">
+                    <div class="tilt-card bg-gradient-to-br from-accent/20 to-transparent rounded-xl p-4 border border-accent/30 text-center">
+                        <div class="text-2xl font-bold text-accent">92</div>
+                        <div class="text-sm text-gray-300">高等数学A</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.6s">
+                    <div class="tilt-card bg-gradient-to-br from-primary/20 to-transparent rounded-xl p-4 border border-primary/30 text-center">
+                        <div class="text-2xl font-bold text-primary">90</div>
+                        <div class="text-sm text-gray-300">线性代数</div>
+                    </div>
+                </div>
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.7s">
+                    <div class="tilt-card bg-gradient-to-br from-secondary/20 to-transparent rounded-xl p-4 border border-secondary/30 text-center">
+                        <div class="text-2xl font-bold text-secondary">90</div>
+                        <div class="text-sm text-gray-300">基础雅思</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 竞赛荣誉 -->
+    <section id="awards" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="section-title fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">竞赛荣誉</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-12"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 蓝桥杯 -->
+                <div class="perspective-1000 fade-in-up">
+                    <div class="tilt-card bg-gradient-to-br from-yellow-500/10 to-transparent rounded-2xl p-8 border border-yellow-500/30 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">
+                                全国一等奖
+                            </span>
+                        </div>
+                        <div class="text-5xl text-yellow-500 mb-4">
+                            <i class="fa fa-trophy"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">第十六届蓝桥杯大赛</h3>
+                        <p class="text-gray-300">嵌入式设计与开发组</p>
+                        <p class="text-gray-500 text-sm mt-2">全国性编程与硬件开发竞赛</p>
+                    </div>
+                </div>
+
+                <!-- 高数竞赛2024 -->
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.2s">
+                    <div class="tilt-card bg-gradient-to-br from-primary/20 to-transparent rounded-2xl p-8 border border-primary/30 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium">
+                                省级一等奖
+                            </span>
+                        </div>
+                        <div class="text-5xl text-primary mb-4">
+                            <i class="fa fa-calculator"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">浙江省大学生高等数学竞赛</h3>
+                        <p class="text-gray-300">2024年度</p>
+                        <p class="text-gray-500 text-sm mt-2">微积分专项竞赛</p>
+                    </div>
+                </div>
+
+                <!-- 高数竞赛2025 -->
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.4s">
+                    <div class="tilt-card bg-gradient-to-br from-secondary/20 to-transparent rounded-2xl p-8 border border-secondary/30 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-secondary/20 text-secondary rounded-full text-sm font-medium">
+                                省级二等奖
+                            </span>
+                        </div>
+                        <div class="text-5xl text-secondary mb-4">
+                            <i class="fa fa-superscript"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">浙江省大学生高等数学竞赛</h3>
+                        <p class="text-gray-300">2025年度</p>
+                        <p class="text-gray-500 text-sm mt-2">连续两年参赛获奖</p>
+                    </div>
+                </div>
+
+                <!-- 数模竞赛 -->
+                <div class="perspective-1000 fade-in-up" style="animation-delay: 0.6s">
+                    <div class="tilt-card bg-gradient-to-br from-accent/20 to-transparent rounded-2xl p-8 border border-accent/30 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">
+                                省级二等奖
+                            </span>
+                        </div>
+                        <div class="text-5xl text-accent mb-4">
+                            <i class="fa fa-bar-chart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">全国大学生数学建模竞赛</h3>
+                        <p class="text-gray-300">2025年度</p>
+                        <p class="text-gray-500 text-sm mt-2">三天三夜解决实际问题</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技能栈 -->
+    <section id="skills" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="section-title fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">技能栈</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mb-12"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- 编程技能 -->
+                <div class="fade-in-up">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fa fa-code text-primary"></i>
+                        编程技能
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>C语言</span>
+                                <span class="text-primary">熟悉</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Python</span>
+                                <span class="text-secondary">了解</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="65"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Matlab</span>
+                                <span class="text-secondary">了解</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="60"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>LaTeX</span>
+                                <span class="text-primary">擅长</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="80"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Linux</span>
+                                <span class="text-secondary">了解</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="55"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>AI辅助编程</span>
+                                <span class="text-accent">熟练</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="90"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 自学方向 -->
+                <div class="fade-in-up" style="animation-delay: 0.3s">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fa fa-lightbulb-o text-secondary"></i>
+                        自学方向
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="perspective-1000">
+                            <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800 text-center">
+                                <div class="text-3xl text-primary mb-2">
+                                    <i class="fa fa-cubes"></i>
+                                </div>
+                                <h4 class="font-medium">嵌入式开发</h4>
+                            </div>
+                        </div>
+                        <div class="perspective-1000">
+                            <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800 text-center">
+                                <div class="text-3xl text-secondary mb-2">
+                                    <i class="fa fa-area-chart"></i>
+                                </div>
+                                <h4 class="font-medium">数学建模</h4>
+                            </div>
+                        </div>
+                        <div class="perspective-1000">
+                            <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800 text-center">
+                                <div class="text-3xl text-accent mb-2">
+                                    <i class="fa fa-microchip"></i>
+                                </div>
+                                <h4 class="font-medium">计算机体系结构</h4>
+                            </div>
+                        </div>
+                        <div class="perspective-1000">
+                            <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800 text-center">
+                                <div class="text-3xl text-primary mb-2">
+                                    <i class="fa fa-bolt"></i>
+                                </div>
+                                <h4 class="font-medium">电路分析</h4>
+                            </div>
+                        </div>
+                        <div class="perspective-1000">
+                            <div class="tilt-card bg-dark/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800 text-center col-span-2">
+                                <div class="text-3xl text-secondary mb-2">
+                                    <i class="fa fa-atom"></i>
+                                </div>
+                                <h4 class="font-medium">量子计算基础</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-10 border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-gray-500">
+                © 2025 ying | 物理×编程 交叉学科开发者
+            </p>
+            <p class="text-gray-600 text-sm mt-2">
+                用数理思维，写高效代码
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 极光背景动画
+        const canvas = document.getElementById('aurora-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let time = 0;
+        function drawAurora() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const gradient1 = ctx.createLinearGradient(0, canvas.height, canvas.width, 0);
+            gradient1.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
+            gradient1.addColorStop(0.5, 'rgba(139, 92, 246, 0.05)');
+            gradient1.addColorStop(1, 'rgba(6, 182, 212, 0.08)');
+            
+            ctx.fillStyle = gradient1;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 动态波浪
+            for(let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height * 0.6);
+                
+                for(let x = 0; x < canvas.width; x++) {
+                    const y = Math.sin(x * 0.005 + time + i) * 50 + 
+                              Math.sin(x * 0.01 + time * 1.2 + i * 2) * 30 +
+                              canvas.height * 0.5 + i * 40;
+                    ctx.lineTo(x, y);
+                }
+                
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.closePath();
+                
+                const alpha = 0.03 - i * 0.01;
+                if(i === 0) {
+                    ctx.fillStyle = `rgba(99, 102, 241, ${alpha})`;
+                } else if(i === 1) {
+                    ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
+                } else {
+                    ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+                }
+                ctx.fill();
+            }
+            
+            time += 0.005;
+            requestAnimationFrame(drawAurora);
+        }
+        drawAurora();
+
+        // 鼠标点击粒子效果
+        document.addEventListener('click', function(e) {
+            const colors = ['#6366f1', '#8b5cf6', '#06b6d4', '#a855f7', '#ec4899'];
+            const particleCount = 15;
+            
+            for(let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 8 + 4;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.backgroundColor = color;
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 100 + 50;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                document.body.appendChild(particle);
+                
+                let x = 0, y = 0;
+                let opacity = 1;
+                const animate = () => {
+                    x += vx * 0.02;
+                    y += vy * 0.02 + 2;
+                    opacity -= 0.02;
+                    
+                    particle.style.transform = `translate(${x}px, ${y}px)`;
+                    particle.style.opacity = opacity;
+                    
+                    if(opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                requestAnimationFrame(animate);
+            }
+        });
+
+        // 3D卡片倾斜效果
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                this.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
+        // 滚动动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    entry.target.classList.add('animated');
+                    
+                    // 触发技能条动画
+                    if(entry.target.closest('#skills')) {
+                        const progressBars = entry.target.querySelectorAll('.skill-progress');
+                        progressBars.forEach(bar => {
+                            const width = bar.getAttribute('data-width');
+                            setTimeout(() => {
+                                bar.style.width = width + '%';
+                            }, 200);
+                        });
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', function() {
+            if(window.scrollY > 50) {
+                navbar.classList.add('bg-dark/90', 'backdrop-blur-lg', 'shadow-lg');
+                navbar.classList.remove('py-4');
+                navbar.classList.add('py-2');
+            } else {
+                navbar.classList.remove('bg-dark/90', 'backdrop-blur-lg', 'shadow-lg');
+                navbar.classList.remove('py-2');
+                navbar.classList.add('py-4');
+            }
+        });
+
+        // 移动端菜单
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 点击移动端菜单链接后关闭菜单
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // 打字机效果
+        const typewriterText = "物理×编程 交叉学科开发者";
+        const typewriterElement = document.getElementById('typewriter');
+        let i = 0;
+        
+        function typeWriter() {
+            if(i < typewriterText.length) {
+                typewriterElement.textContent += typewriterText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        
+        window.addEventListener('load', function() {
+            setTimeout(typeWriter, 500);
+        });
+    </script>
+</body>
+</html>
